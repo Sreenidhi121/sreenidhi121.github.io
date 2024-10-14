@@ -1,4 +1,103 @@
-<h1>
-    Hello World
-</h1>
-<iframe width="600" height="371" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTUPD4Lz3qnXCY9EoRZM2olbDwn6AdVd-CGlJrM6GG8yKgOiAruESdy3iNCDcW3PrI6kL7PWg7UHbpx/pubchart?oid=1818620929&amp;format=interactive"></iframe>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Google Map with Marker and Embedded Chart</title>
+
+    <!-- Adding Bootstrap for styling -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <style>
+      #map {
+        height: 500px;
+        width: 100%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="text-center">HELLO WORLD</h1>
+
+    <!-- Embed Google Spreadsheet Chart -->
+    <div class="text-center my-4">
+      <iframe width="600" height="371" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTUPD4Lz3qnXCY9EoRZM2olbDwn6AdVd-CGlJrM6GG8yKgOiAruESdy3iNCDcW3PrI6kL7PWg7UHbpx/pubchart?oid=1818620929&amp;format=interactive"></iframe>
+    </div>
+
+    <!-- Google Map Section -->
+    <div class="container">
+      <h3 class="text-center">Google Map with Markers</h3>
+      <div id="map"></div>
+    </div>
+
+    <script>
+      // Initialize and add the map
+      function initMap() {
+        // The location of VNIT Nagpur
+        var vnitLocation = { lat: 21.1236, lng: 79.0511 };
+
+        // The map centered at VNIT Nagpur
+        var map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 14,
+          center: vnitLocation,
+        });
+
+        // The marker, positioned at VNIT Nagpur
+        var marker = new google.maps.Marker({
+          position: vnitLocation,
+          map: map,
+          title: "VNIT Nagpur",
+        });
+
+        // Add an information window
+        var infoWindow = new google.maps.InfoWindow({
+          content: "<h5>VNIT Nagpur</h5><p>Visvesvaraya National Institute of Technology</p>",
+        });
+
+        // Open info window on marker click
+        marker.addListener("click", function () {
+          infoWindow.open(map, marker);
+        });
+
+        // Add markers dynamically on click with user description
+        map.addListener("click", function (event) {
+          addMarkerWithDescription(event.latLng, map);
+        });
+
+        // Function to add a new marker with user message
+        function addMarkerWithDescription(location, map) {
+          // Prompt user for a message/description for the new marker
+          var message = prompt("Enter a message/description for this marker:");
+
+          // Create the new marker
+          var newMarker = new google.maps.Marker({
+            position: location,
+            map: map,
+          });
+
+          // Create an info window with the user-entered message
+          var newInfoWindow = new google.maps.InfoWindow({
+            content: message ? message : "No message entered.",
+          });
+
+          // Add click listener to open info window with the message
+          newMarker.addListener("click", function () {
+            newInfoWindow.open(map, newMarker);
+          });
+        }
+      }
+    </script>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Correct Google Maps API script -->
+    <script async defer  src="https://maps.gomaps.pro/maps/api/js?key=AlzaSyxyC5xNCHsh6LqqjyGDyRoCGVd9_HnXpGz&callback=initMap"></script>
+  </body>
+</html>
