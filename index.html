@@ -3,11 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Maps API Example</title>
+    <title>Google Maps API Integration</title>
+    <style>
+        /* Basic styling for the page */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+    <script>
+        var map, geocoder, directionsService, directionsRenderer;
+
+        function initMap() {
+            // Set initial map center (default coordinates)
+            var defaultLocation = { lat: 37.7749, lng: -122.4194 }; // San Francisco, CA
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 8,
+                center: defaultLocation
+            });
+
+            // Initialize services
+            geocoder = new google.maps.Geocoder();
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsRenderer.setMap(map);
+
+            // Example Geocoding request (convert address to coordinates)
+            geocodeAddress('1600 Amphitheatre Parkway, Mountain View, CA');
+        }
+
+        // Geocoding API: Converts address to coordinates
+        function geocodeAddress(address) {
+            geocoder.geocode({ 'address': address }, function(results, status) {
+                if (status === 'OK') {
+                    map.setCenter(results[0].geometry.location);
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: results[0].geometry.location
+                    });
+                    document.getElementById('info').innerHTML += `<p>Geocoded Address: ${address}, Location: (${results[0].geometry.location.lat()}, ${results[0].geometry.location.lng()})</p>`;
+                } else {
+                    alert('Geocode was not successful: ' + status);
+                }
+            });
+        }
+
+        // Directions API: Get directions from two locations
+        function calculateRoute() {
+            var start = document.getElementById('start').value;
+            var end = document.getElementById('end').value;
+            
+            directionsService.route(
+                {
+                    origin: start,
+                    destination: end,
+                    travelMode: 'DRIVING'
+                },
+                function(response, status) {
+                    if (status === 'OK') {
+                        directionsRenderer.setDirections(response);
+                    } else {
+                        alert('Directions request failed due to ' + status);
+                    }
+                }
+            );
+        }
+
+        // Distance Matrix API: Get distance and duration between two locations
+        function calculateDistance() {
+            var start = document.getElementById('start').value;
+            var end = document.getElementById('end').value;
+
+            var service = new google.maps.DistanceMatrixService();
+            service.getDistanceMatrix(
+                {
+                    origins: [start],
+                    destinations: [end],
+                    travelMode: 'DRIVING',
+                    unitSystem: google.maps.UnitSystem.METRIC
+                },
+                function(response, status) {
+                    if (status === 'OK') {
+                        var results = response.rows[0].elements;
+                        var distance = results[0].distance.text;
+                        var duration = results[0].duration.text;
+                        document.getElementById('info').innerHTML += `<p>Distance: ${distance}, Duration: ${duration}</p>`;
+                    } else {
+                        alert('Error: ' + status);
+                    }
+                }
+            );
+        }
+    </script>
 </head>
 <body>
-    <h1>Static Google Map</h1>
-    <p>Here is a static Google Map for the address 1600 Amphitheatre Parkway, Mountain View, CA:</p>
-    <img src="https://maps.googleapis.com/maps/api/staticmap?center=37.4224764,-122.0842499&zoom=14&size=600x300&maptype=roadmap&markers=color:red%7Clabel:C%7C37.4224764,-122.0842499&key=AlzaSyxyC5xNCHsh6LqqjyGDyRoCGVd9_HnXpGz" alt="Static Google Map">
+    <h1>Google Maps API Integration</h1>
+
+    <!-- Input fields to get origin and destination -->
+    <div>
+        <input type="text" id="start" placeholder="Enter origin" value="New York, NY">
+        <input type="text" id="end" placeholder="Enter destination" value="Los Angeles, CA">
+        <button onclick="calculateRoute()">Get Directions</button>
+        <button onclick="calculateDistance()">Get Distance</button>
+    </div>
+
+    <!-- Map element -->
+    <div id="map"></div>
+
+    <!-- Information display area -->
+    <div id="info"></div>
+
 </body>
 </html>
